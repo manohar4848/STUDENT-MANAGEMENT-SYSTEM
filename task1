@@ -1,0 +1,148 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Define a structure to hold student information
+struct Student {
+    int id;
+    char name[50];
+    float grades[5]; // Assuming 5 subjects for simplicity
+    float average_grade;
+};
+
+// Function prototypes
+void registerStudent(struct Student students[], int *numStudents);
+void editStudent(struct Student students[], int numStudents);
+void deleteStudent(struct Student students[], int *numStudents);
+void calculateGrades(struct Student *student);
+
+// Main function
+int main() {
+    struct Student students[50]; // Array to store up to 50 students
+    int numStudents = 0;
+    int choice;
+
+    do {
+        printf("\n\nStudent Management System\n");
+        printf("1. Register a new student\n");
+        printf("2. Edit student information\n");
+        printf("3. Delete a student\n");
+        printf("4. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch(choice) {
+            case 1:
+                registerStudent(students, &numStudents);
+                break;
+            case 2:
+                editStudent(students, numStudents);
+                break;
+            case 3:
+                deleteStudent(students, &numStudents);
+                break;
+            case 4:
+                printf("Exiting program.\n");
+                break;
+            default:
+                printf("Invalid choice. Please enter a valid option.\n");
+        }
+    } while(choice != 4);
+
+    return 0;
+}
+
+// Function to register a new student
+void registerStudent(struct Student students[], int *numStudents) {
+    if (*numStudents >= 50) {
+        printf("Cannot register more students. Array full.\n");
+        return;
+    }
+
+    struct Student newStudent;
+
+    printf("Enter student ID: ");
+    scanf("%d", &newStudent.id);
+    printf("Enter student name: ");
+    scanf(" %[^\n]s", newStudent.name);
+
+    // Assuming fixed number of subjects for simplicity
+    printf("Enter grades for 5 subjects:\n");
+    for (int i = 0; i < 5; i++) {
+        printf("Subject %d: ", i + 1);
+        scanf("%f", &newStudent.grades[i]);
+    }
+
+    calculateGrades(&newStudent);
+
+    students[*numStudents] = newStudent;
+    (*numStudents)++;
+
+    printf("Student registered successfully.\n");
+}
+
+// Function to edit student information
+void editStudent(struct Student students[], int numStudents) {
+    int id;
+    int found = 0;
+
+    printf("Enter student ID to edit: ");
+    scanf("%d", &id);
+
+    for (int i = 0; i < numStudents; i++) {
+        if (students[i].id == id) {
+            printf("Enter new name for student: ");
+            scanf(" %[^\n]s", students[i].name);
+            printf("Enter new grades for 5 subjects:\n");
+            for (int j = 0; j < 5; j++) {
+                printf("Subject %d: ", j + 1);
+                scanf("%f", &students[i].grades[j]);
+            }
+            calculateGrades(&students[i]);
+            found = 1;
+            printf("Student information updated successfully.\n");
+            break;
+        }
+    }
+
+    if (!found) {
+        printf("Student not found with ID %d.\n", id);
+    }
+}
+
+// Function to delete a student
+void deleteStudent(struct Student students[], int *numStudents) {
+    int id;
+    int found = 0;
+
+    printf("Enter student ID to delete: ");
+    scanf("%d", &id);
+
+    for (int i = 0; i < *numStudents; i++) {
+        if (students[i].id == id) {
+            // Shift all subsequent students one position to the left
+            for (int j = i; j < *numStudents - 1; j++) {
+                students[j] = students[j + 1];
+            }
+            (*numStudents)--;
+            found = 1;
+            printf("Student deleted successfully.\n");
+            break;
+        }
+    }
+
+    if (!found) {
+        printf("Student not found with ID %d.\n", id);
+    }
+}
+
+// Function to calculate average grade for a student
+void calculateGrades(struct Student *student) {
+    float sum = 0.0;
+
+    for (int i = 0; i < 5; i++) {
+        sum += student->grades[i];
+    }
+
+    student->average_grade = sum / 5.0;
+}
